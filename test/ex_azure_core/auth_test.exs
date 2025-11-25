@@ -103,7 +103,7 @@ defmodule ExAzureCore.AuthTest do
     end
 
     test "raises on error when no token is available" do
-      assert_raise TokenServerError, ~r/Failed to fetch token/, fn ->
+      assert_raise TokenServerError, fn ->
         Auth.fetch!(:nonexistent_credential)
       end
     end

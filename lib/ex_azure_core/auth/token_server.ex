@@ -76,6 +76,9 @@ defmodule ExAzureCore.Auth.TokenServer do
   @spec fetch(atom()) :: {:ok, map()} | {:error, term()}
   def fetch(name) do
     GenServer.call(via_tuple(name), :fetch)
+  catch
+    :exit, reason ->
+      {:error, TokenServerError.exception(type: :fetch_failed, name: name, reason: reason)}
   end
 
   @impl true

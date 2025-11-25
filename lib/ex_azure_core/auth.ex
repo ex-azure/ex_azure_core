@@ -4,7 +4,6 @@ defmodule ExAzureCore.Auth do
 
   Provides credential server management and token acquisition functionality.
   """
-  alias ExAzureCore.Auth.Errors.TokenServerError
 
   @doc """
   Starts a credential server.
@@ -106,7 +105,7 @@ defmodule ExAzureCore.Auth do
         token
 
       {:error, reason} ->
-        raise TokenServerError.exception(type: :fetch_failed, name: name, reason: reason)
+        raise reason
     end
   end
 end
