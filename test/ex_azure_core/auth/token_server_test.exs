@@ -1,5 +1,5 @@
 defmodule ExAzureCore.Auth.TokenServerTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
   use Mimic
 
   alias ExAzureCore.Auth.Errors.ConfigurationError
