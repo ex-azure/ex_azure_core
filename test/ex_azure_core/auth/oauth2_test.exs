@@ -109,9 +109,9 @@ defmodule ExAzureCore.Auth.OAuth2Test do
 
     test "handles AADSTS error codes" do
       test_cases = [
-        {70021, :federation_trust_mismatch},
+        {70_021, :federation_trust_mismatch},
         {700_016, :invalid_tenant_id},
-        {50027, :invalid_jwt},
+        {50_027, :invalid_jwt},
         {700_027, :certificate_not_found}
       ]
 

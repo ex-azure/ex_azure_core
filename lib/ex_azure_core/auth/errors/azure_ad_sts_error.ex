@@ -1,4 +1,7 @@
 defmodule ExAzureCore.Auth.Errors.AzureAdStsError do
+  @moduledoc """
+  Azure AD Security Token Service error with specific AADSTS error code handling.
+  """
   use Splode.Error, fields: [:error_code, :description, :type], class: :authentication
 
   @impl true
@@ -66,30 +69,30 @@ defmodule ExAzureCore.Auth.Errors.AzureAdStsError do
 
   defp handle_aadsts_error_codes(error_codes) when is_list(error_codes) do
     cond do
-      70021 in error_codes ->
+      70_021 in error_codes ->
         __MODULE__.exception(
-          error_code: 70021,
+          error_code: 70_021,
           description: "The provided client secret is expired or invalid.",
           type: :federation_trust_mismatch
         )
 
       700_016 in error_codes ->
         __MODULE__.exception(
-          error_code: 70016,
+          error_code: 700_016,
           description: "The provided tenant ID is invalid or does not exist.",
           type: :invalid_tenant_id
         )
 
-      50027 in error_codes ->
+      50_027 in error_codes ->
         __MODULE__.exception(
-          error_code: 50027,
+          error_code: 50_027,
           description: "Invalid JWT token. Check certificate and signing.",
           type: :invalid_jwt
         )
 
       700_027 in error_codes ->
         __MODULE__.exception(
-          error_code: 70027,
+          error_code: 700_027,
           description: "Certificate not found in tenant configuration.",
           type: :certificate_not_found
         )

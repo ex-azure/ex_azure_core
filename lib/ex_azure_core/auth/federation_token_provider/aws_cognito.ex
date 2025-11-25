@@ -1,4 +1,10 @@
 defmodule ExAzureCore.Auth.FederationTokenProvider.AwsCognito do
+  @moduledoc """
+  AWS Cognito implementation for federated token provider.
+
+  Supports both basic and enhanced authentication flows for retrieving
+  identity tokens from AWS Cognito Identity pools.
+  """
   @behaviour ExAzureCore.Auth.FederatedTokenProvider
 
   alias ExAws.CognitoIdentity

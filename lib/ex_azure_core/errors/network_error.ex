@@ -1,4 +1,7 @@
 defmodule ExAzureCore.Errors.NetworkError do
+  @moduledoc """
+  Network-related error when connecting to external services fails.
+  """
   use Splode.Error, fields: [:service, :endpoint, :reason], class: :external
 
   @type t() :: %__MODULE__{

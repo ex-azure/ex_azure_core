@@ -48,5 +48,5 @@ defmodule ExAzureCore.Auth.TokenSource do
     * `{:ok, token}` - A map containing the token and metadata
     * `{:error, reason}` - An error tuple with the failure reason
   """
-  @callback fetch_token(config :: keyword()) :: {:ok, map()} | {:error, term()}
+  @callback fetch_token(config :: map()) :: {:ok, map()} | {:error, term()}
 end

@@ -46,9 +46,8 @@ defmodule ExAzureCore.Auth.TokenSource.ClientAssertion do
          {:ok, client_id} <- fetch_required(config, :client_id),
          {:ok, scope} <- fetch_required(config, :scope),
          {:ok, provider} <- fetch_required(config, :provider),
-         {:ok, assertion} <- get_federated_token(provider, config),
-         {:ok, token} <- exchange_token(tenant_id, client_id, assertion, scope, config) do
-      {:ok, token}
+         {:ok, assertion} <- get_federated_token(provider, config) do
+      exchange_token(tenant_id, client_id, assertion, scope, config)
     end
   end
 

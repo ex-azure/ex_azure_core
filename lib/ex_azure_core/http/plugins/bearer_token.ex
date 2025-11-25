@@ -62,9 +62,6 @@ defmodule ExAzureCore.Http.Plugins.BearerToken do
       {:ok, %{access_token: token}} ->
         {:ok, token}
 
-      {:ok, token} when is_binary(token) ->
-        {:ok, token}
-
       {:error, reason} ->
         {:error, reason}
     end

@@ -43,24 +43,12 @@ defmodule ExAzureCore.Http.Streaming.StreamHandler do
   @spec download_to_file(Client.client(), String.t(), Path.t(), keyword()) ::
           {:ok, map()} | {:error, term()}
   def download_to_file(client, url, file_path, opts \\ []) do
-    file_stream = File.stream!(file_path, [:write, :binary])
-
-    request_opts = [
-      method: :get,
-      url: url,
-      into: file_stream
-    ]
-
+    request_opts = [method: :get, url: url, output: file_path]
     request_opts = add_optional_opts(request_opts, opts)
 
-    case Req.request(client, request_opts) do
+    case Client.get(client, url, request_opts) do
       {:ok, response} ->
-        {:ok,
-         %{
-           status: response.status,
-           headers: response.headers,
-           path: file_path
-         }}
+        {:ok, %{status: response.status, headers: response.headers, path: file_path}}
 
       {:error, reason} ->
         File.rm(file_path)

@@ -1,4 +1,9 @@
 defmodule ExAzureCore.Auth do
+  @moduledoc """
+  Authentication module for Azure services.
+
+  Provides credential server management and token acquisition functionality.
+  """
   alias ExAzureCore.Auth.Errors.TokenServerError
 
   @doc """
