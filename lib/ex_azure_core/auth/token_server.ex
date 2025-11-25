@@ -168,6 +168,12 @@ defmodule ExAzureCore.Auth.TokenServer do
       :client_assertion ->
         TokenSource.ClientAssertion.fetch_token(config)
 
+      :managed_identity ->
+        TokenSource.ManagedIdentity.fetch_token(config)
+
+      :workload_identity ->
+        TokenSource.WorkloadIdentity.fetch_token(config)
+
       other ->
         {:error, TokenServerError.exception(type: :unknown_source_type, name: nil, reason: other)}
     end

@@ -108,8 +108,5 @@ defmodule ExAzureCore.Auth do
       {:error, reason} ->
         raise TokenServerError.exception(type: :fetch_failed, name: name, reason: reason)
     end
-  catch
-    :exit, reason ->
-      raise TokenServerError.exception(type: :fetch_failed, name: name, reason: reason)
   end
 end
