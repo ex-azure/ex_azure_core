@@ -1,0 +1,46 @@
+defmodule ExAzureCore.MixProject do
+  use Mix.Project
+
+  def project do
+    [
+      app: :ex_azure_core,
+      version: "0.1.0",
+      elixir: "~> 1.19",
+      elixirc_paths: elixirc_paths(Mix.env()),
+      start_permanent: Mix.env() == :prod,
+      deps: deps()
+    ]
+  end
+
+  def application do
+    [
+      extra_applications: [:logger],
+      mod: {ExAzureCore.Application, []}
+    ]
+  end
+
+  defp deps do
+    [
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
+      {:doctor, "~> 0.21", only: [:dev, :test], runtime: false},
+      {:ex_aws, "~> 2.3", optional: true},
+      {:ex_aws_cognito_identity, "~> 1.2", optional: true},
+      {:excoveralls, "~> 0.14", only: :test},
+      {:ex_check, "~> 0.14", only: [:dev, :test], runtime: false},
+      {:ex_doc, "~> 0.28", only: :dev, runtime: false},
+      {:jason, "~> 1.4"},
+      {:mimic, "~> 2.0", only: :test},
+      {:mix_audit, ">= 0.0.0", only: [:dev, :test], runtime: false},
+      {:nimble_options, "~> 1.0"},
+      {:recode, "~> 0.8.0", only: [:dev], runtime: false},
+      {:req, "~> 0.4"},
+      {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
+      {:splode, "~> 0.2"},
+      {:zoi, "~> 0.11"}
+    ]
+  end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
+end
