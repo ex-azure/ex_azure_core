@@ -9,9 +9,17 @@ defmodule ExAzureCore.Auth.FederatedTokenProvider do
 
   alias ExAzureCore.Auth.Errors.FederationError
 
+  @doc """
+  Defines the callback for retrieving a federated identity token.
+  """
   @callback get_token(identity_id :: String.t(), opts :: Keyword.t()) ::
               {:ok, String.t()} | {:error, String.t()}
 
+  @doc """
+  Retrieves a federated identity token from the specified provider.
+  """
+  @spec get_token(provider :: atom(), opts :: Keyword.t()) ::
+          {:ok, String.t()} | {:error, String.t()}
   def get_token(provider, opts \\ []) do
     {identity_id, opts} = Keyword.pop(opts, :identity_id, "")
 

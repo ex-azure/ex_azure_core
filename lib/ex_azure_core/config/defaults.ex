@@ -53,7 +53,8 @@ defmodule ExAzureCore.Config.Defaults do
   """
   @spec get(atom()) :: map()
   def get(service) do
-    custom = Application.get_env(:ex_azure_core, {:defaults, service}, %{})
+    custom_defaults = Application.get_env(:ex_azure_core, :custom_service_defaults, %{})
+    custom = Map.get(custom_defaults, service, %{})
 
     builtin =
       Map.get(@service_defaults, service, %{})
@@ -90,7 +91,9 @@ defmodule ExAzureCore.Config.Defaults do
   """
   @spec register(atom(), map()) :: :ok
   def register(service, defaults) when is_atom(service) and is_map(defaults) do
-    Application.put_env(:ex_azure_core, {:defaults, service}, defaults)
+    current_defaults = Application.get_env(:ex_azure_core, :custom_service_defaults, %{})
+    updated_defaults = Map.put(current_defaults, service, defaults)
+    Application.put_env(:ex_azure_core, :custom_service_defaults, updated_defaults)
     :ok
   end
 end

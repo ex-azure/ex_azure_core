@@ -37,6 +37,7 @@ defmodule ExAzureCore.MixProject do
       {:req, "~> 0.4"},
       {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
       {:splode, "~> 0.2"},
+      {:telemetry, "~> 1.0"},
       {:zoi, "~> 0.11"}
     ]
   end

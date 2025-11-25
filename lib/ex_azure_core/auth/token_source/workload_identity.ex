@@ -104,7 +104,9 @@ defmodule ExAzureCore.Auth.TokenSource.WorkloadIdentity do
   end
 
   defp read_token_file(path) do
-    case File.read(path) do
+    safe_path = Path.expand(path)
+
+    case File.read(safe_path) do
       {:ok, content} ->
         token = String.trim(content)
 

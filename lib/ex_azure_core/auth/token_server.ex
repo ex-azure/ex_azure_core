@@ -19,7 +19,7 @@ defmodule ExAzureCore.Auth.TokenServer do
 
   ## Examples
 
-      {:ok, _pid} = ExAzureIdentity.TokenServer.start_link(
+      {:ok, _pid} = ExAzureCore.Auth.TokenServer.start_link(
         name: :my_credential,
         source: {:client_assertion, %{
           tenant_id: "...",
@@ -31,7 +31,7 @@ defmodule ExAzureCore.Auth.TokenServer do
         prefetch: :sync
       )
 
-      {:ok, token} = ExAzureIdentity.TokenServer.fetch(:my_credential)
+      {:ok, token} = ExAzureCore.Auth.TokenServer.fetch(:my_credential)
   """
 
   use GenServer
