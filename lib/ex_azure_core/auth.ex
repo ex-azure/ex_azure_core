@@ -74,7 +74,7 @@ defmodule ExAzureCore.Auth do
       token.expires_at
       #=> 1234567890
   """
-  @spec fetch(atom()) :: {:ok, map()} | {:error, term()}
+  @spec fetch(term()) :: {:ok, map()} | {:error, term()}
   defdelegate fetch(name), to: ExAzureCore.Auth.TokenServer
 
   @doc """
@@ -98,7 +98,7 @@ defmodule ExAzureCore.Auth do
       token.access_token
       #=> "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Ik..."
   """
-  @spec fetch!(atom()) :: map()
+  @spec fetch!(term()) :: map()
   def fetch!(name) do
     case fetch(name) do
       {:ok, token} ->

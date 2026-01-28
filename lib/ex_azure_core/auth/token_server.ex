@@ -47,7 +47,7 @@ defmodule ExAzureCore.Auth.TokenServer do
   @default_prefetch :async
 
   @type state :: %{
-          name: atom(),
+          name: term(),
           source: term(),
           refresh_before: non_neg_integer(),
           max_retries: non_neg_integer(),
@@ -73,7 +73,7 @@ defmodule ExAzureCore.Auth.TokenServer do
 
   Returns the cached token if available, otherwise fetches a new one.
   """
-  @spec fetch(atom()) :: {:ok, map()} | {:error, term()}
+  @spec fetch(term()) :: {:ok, map()} | {:error, term()}
   def fetch(name) do
     GenServer.call(via_tuple(name), :fetch)
   catch
