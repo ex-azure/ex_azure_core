@@ -16,7 +16,7 @@ defmodule ExAzureCore.Auth do
 
   ## Examples
 
-      {:ok, pid} = ExAzureIdentity.start_link(
+      {:ok, pid} = ExAzureCore.Auth.start_link(
         name: :my_credential,
         source: {:client_assertion, %{
           tenant_id: "...",
@@ -68,7 +68,7 @@ defmodule ExAzureCore.Auth do
 
   ## Examples
 
-      {:ok, token} = ExAzureIdentity.fetch(MyApp.AzureToken)
+      {:ok, token} = ExAzureCore.Auth.fetch(MyApp.AzureToken)
       token.access_token
       #=> "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Ik..."
       token.expires_at
@@ -94,7 +94,7 @@ defmodule ExAzureCore.Auth do
 
   ## Examples
 
-      token = ExAzureIdentity.fetch!(MyApp.AzureToken)
+      token = ExAzureCore.Auth.fetch!(MyApp.AzureToken)
       token.access_token
       #=> "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Ik..."
   """
