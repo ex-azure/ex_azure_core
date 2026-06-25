@@ -4,6 +4,32 @@ defmodule ExAzureCore.Auth.FederationTokenProvider.AwsCognito do
 
   Supports both basic and enhanced authentication flows for retrieving
   identity tokens from AWS Cognito Identity pools.
+
+  ## Authentication flows
+
+    * `:basic` - calls `GetOpenIdToken` with an existing Cognito `IdentityId`.
+    * `:enhanced` - calls `GetOpenIdTokenForDeveloperIdentity` with the identity
+      pool id and a `:logins` map (developer-authenticated identities).
+
+  ## Pinning a Cognito IdentityId in the enhanced flow
+
+  In the enhanced flow the first argument is the *identity pool id*, not a
+  Cognito `IdentityId`. By default `GetOpenIdTokenForDeveloperIdentity` resolves
+  the developer-user-identifier from `:logins` to an existing identity, or
+  creates a new one when none matches. That implicit resolve-or-create runs on
+  every token refresh, so a new identity can be minted whenever resolution
+  fails, and the OIDC token's subject (the `IdentityId`) drifts away from the
+  one that was federated into Azure.
+
+  Pass `:cognito_identity_id` to pin the exact identity established at setup. It
+  is forwarded as the `IdentityId` argument so Cognito reuses that identity
+  instead of resolving or creating one per refresh:
+
+      AwsCognito.get_token(pool_id,
+        auth_type: :enhanced,
+        logins: %{"your-developer-provider" => client_id},
+        cognito_identity_id: "us-east-1:12345678-1234-1234-1234-123456789012"
+      )
   """
   @behaviour ExAzureCore.Auth.FederatedTokenProvider
 
@@ -20,32 +46,35 @@ defmodule ExAzureCore.Auth.FederationTokenProvider.AwsCognito do
   end
 
   defp fetch_token_using_basic_auth(identity_id) do
-    case CognitoIdentity.get_open_id_token(identity_id) |> ExAws.request() do
-      {:ok, result} ->
-        {:ok, result["Token"]}
-
-      {:error, err} ->
-        {:error,
-         FederationError.exception(type: :token_fetch_failed, provider: :aws_cognito, reason: err)}
-    end
+    CognitoIdentity.get_open_id_token(identity_id)
+    |> ExAws.request()
+    |> handle_response()
   end
 
-  defp fetch_token_using_enhanced_auth(identity_id, opts) do
+  defp fetch_token_using_enhanced_auth(pool_id, opts) do
     with {:ok, logins} <- parse_logins(opts) do
-      do_fetch_token_using_enhanced_auth(identity_id, logins)
+      CognitoIdentity.get_open_id_token_for_developer_identity(
+        pool_id,
+        logins,
+        identity_opts(opts)
+      )
+      |> ExAws.request()
+      |> handle_response()
     end
   end
 
-  defp do_fetch_token_using_enhanced_auth(identity_id, logins) do
-    case CognitoIdentity.get_open_id_token_for_developer_identity(identity_id, logins)
-         |> ExAws.request() do
-      {:ok, result} ->
-        {:ok, result["Token"]}
-
-      {:error, err} ->
-        {:error,
-         FederationError.exception(type: :token_fetch_failed, provider: :aws_cognito, reason: err)}
+  defp identity_opts(opts) do
+    case Keyword.get(opts, :cognito_identity_id) do
+      nil -> []
+      cognito_identity_id -> [identity_id: cognito_identity_id]
     end
+  end
+
+  defp handle_response({:ok, %{"Token" => token}}), do: {:ok, token}
+
+  defp handle_response({:error, err}) do
+    {:error,
+     FederationError.exception(type: :token_fetch_failed, provider: :aws_cognito, reason: err)}
   end
 
   defp parse_logins(opts) do

@@ -21,7 +21,7 @@ jobs:
       - uses: actions/create-github-app-token@v2
         id: app-token
         with:
-          app-id: 2745724
+          app-id: 2997947
           private-key: ${{ secrets.APP_KEY }}
 
       - name: "Prepare Release"

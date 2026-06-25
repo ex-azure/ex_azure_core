@@ -32,6 +32,17 @@ defmodule ExAzureCore.Auth.TokenSource.ClientAssertion do
       }
 
       {:ok, token} = ExAzureIdentity.Sources.ClientAssertion.fetch_token(config)
+
+  For the AWS Cognito enhanced flow, `:identity_id` carries the identity *pool*
+  id and `:cognito_identity_id` pins the exact Cognito identity that was
+  federated into Azure, so the same subject is reused on every refresh:
+
+      provider_opts: [
+        identity_id: "us-west-2:pool-guid",
+        auth_type: :enhanced,
+        logins: %{"your-developer-provider" => "client-id"},
+        cognito_identity_id: "us-west-2:12345678-1234-1234-1234-123456789012"
+      ]
   """
 
   @behaviour ExAzureCore.Auth.TokenSource
