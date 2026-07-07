@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.2.0](https://github.com/ex-azure/ex_azure_core/compare/v0.1.0...v0.2.0) (2026-07-07)
+
+
+### Features
+
+* **operation:** add default_host fallback to REST base-url resolution ([165ea44](https://github.com/ex-azure/ex_azure_core/commit/165ea441e15ffe37ea30a5bd87ee644968caacea))
+
+
+### Bug Fixes
+
+* Fixed issue with pinning the cognito identity id ([dae6a5c](https://github.com/ex-azure/ex_azure_core/commit/dae6a5cb45661966cc7992626a27625d683ce144))
+
 ## 0.1.0 (2026-01-28)
 
 
