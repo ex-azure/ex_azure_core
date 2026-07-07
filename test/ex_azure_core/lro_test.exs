@@ -84,6 +84,7 @@ defmodule ExAzureCore.LroTest do
       resp(200, [], %{"id" => 9, "name" => "sync"})
     end)
 
-    assert {:ok, %{"id" => 9, "name" => "sync"}} = Lro.run(%{}, op(), final: :poll_body, delay_ms: 0)
+    assert {:ok, %{"id" => 9, "name" => "sync"}} =
+             Lro.run(%{}, op(), final: :poll_body, delay_ms: 0)
   end
 end

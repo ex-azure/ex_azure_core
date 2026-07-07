@@ -12,8 +12,8 @@ defmodule ExAzureCore.Lro do
   GETting the original resource URI or from the terminal poll body.
   """
 
-  alias ExAzureCore.Operation
   alias ExAzureCore.Http.Response
+  alias ExAzureCore.Operation
 
   @poll_headers ["operation-location", "azure-asyncoperation", "location"]
   @default_delay_ms 1_000
@@ -46,15 +46,23 @@ defmodule ExAzureCore.Lro do
   defp poll(config, initial_op, url, opts, decode) do
     status_path = Keyword.get(opts, :status_path, "status")
     succeeded = Keyword.get(opts, :succeeded, ["Succeeded"])
-    terminal_error = Keyword.get(opts, :failed, ["Failed"]) ++ Keyword.get(opts, :canceled, ["Canceled"])
+
+    terminal_error =
+      Keyword.get(opts, :failed, ["Failed"]) ++ Keyword.get(opts, :canceled, ["Canceled"])
 
     with {:ok, response} <- perform(get_op(initial_op, url), config) do
       status = response.body |> Map.get(status_path) |> to_string()
 
       cond do
-        status in succeeded -> resolve_final(config, initial_op, response, opts, decode)
-        status in terminal_error -> {:error, {:lro_failed, status, response.body}}
-        true -> delay(response, config, opts) && poll(config, initial_op, url, opts, decode)
+        status in succeeded ->
+          resolve_final(config, initial_op, response, opts, decode)
+
+        status in terminal_error ->
+          {:error, {:lro_failed, status, response.body}}
+
+        true ->
+          delay(response, config, opts)
+          poll(config, initial_op, url, opts, decode)
       end
     end
   end
@@ -106,6 +114,6 @@ defmodule ExAzureCore.Lro do
       end
 
     if ms > 0, do: Process.sleep(ms)
-    true
+    :ok
   end
 end
