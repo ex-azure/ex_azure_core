@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.3.0](https://github.com/ex-azure/ex_azure_core/compare/v0.2.0...v0.3.0) (2026-07-07)
+
+
+### Features
+
+* **lro:** add long-running operation poller ([e9d495d](https://github.com/ex-azure/ex_azure_core/commit/e9d495d9d94bb5df9bdedc8b99be7d1420ab0cb7))
+* **paging:** add continuation_stream for token-based pagination ([06fb77a](https://github.com/ex-azure/ex_azure_core/commit/06fb77a29af517258dab677fcf6bff4d792e8b19))
+* **paging:** add nextlink_stream helper for paginated responses ([54cf135](https://github.com/ex-azure/ex_azure_core/commit/54cf135d5fd4ce7db9dbbe3f51eee4e18815c855))
+
+
+### Bug Fixes
+
+* Fixed some alerts ([5446081](https://github.com/ex-azure/ex_azure_core/commit/5446081d896803367997c9f10697cd4643c67e92))
+
 ## [0.2.0](https://github.com/ex-azure/ex_azure_core/compare/v0.1.0...v0.2.0) (2026-07-07)
 
 
