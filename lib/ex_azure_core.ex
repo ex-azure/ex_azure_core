@@ -177,4 +177,24 @@ defmodule ExAzureCore do
     config = Config.new(operation.service, config_overrides)
     Operation.stream!(operation, config)
   end
+
+  @doc """
+  Drives a long-running operation to completion, returning its final result.
+
+  Performs the initial request, polls the status monitor until the operation
+  reaches a terminal state, and resolves the final result.
+
+  ## Examples
+
+      {:ok, pet} = PetStoreClient.Pets.create(pet) |> ExAzureCore.poll()
+
+  ## Raises
+
+  Raises `ArgumentError` if the operation is not a long-running operation.
+  """
+  @spec poll(Operation.t(), keyword()) :: {:ok, term()} | {:error, term()}
+  def poll(operation, config_overrides \\ []) do
+    config = Config.new(operation.service, config_overrides)
+    Operation.poll(operation, config)
+  end
 end

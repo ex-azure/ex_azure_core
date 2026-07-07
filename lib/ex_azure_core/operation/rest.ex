@@ -18,6 +18,7 @@ defmodule ExAzureCore.Operation.REST do
     * `:headers` - Additional headers
     * `:parser` - Optional function to parse response body
     * `:stream_builder` - Optional function to build pagination stream
+    * `:poller` - Optional function to drive a long-running operation to completion
 
   ## Example
 
@@ -42,7 +43,8 @@ defmodule ExAzureCore.Operation.REST do
           params: map(),
           headers: [{String.t(), String.t()}],
           parser: (ExAzureCore.Http.Response.t() -> term()) | nil,
-          stream_builder: (map() -> Enumerable.t()) | nil
+          stream_builder: (map() -> Enumerable.t()) | nil,
+          poller: (map() -> {:ok, term()} | {:error, term()}) | nil
         }
 
   defstruct [
@@ -55,7 +57,8 @@ defmodule ExAzureCore.Operation.REST do
     params: %{},
     headers: [],
     parser: nil,
-    stream_builder: nil
+    stream_builder: nil,
+    poller: nil
   ]
 end
 
@@ -88,6 +91,17 @@ defimpl ExAzureCore.Operation, for: ExAzureCore.Operation.REST do
 
   def stream!(%{stream_builder: builder}, config) when is_function(builder, 1) do
     builder.(config)
+  end
+
+  @doc """
+  Drives a long-running operation to completion.
+  """
+  def poll(%{poller: nil}, _config) do
+    raise ArgumentError, "This operation is not a long-running operation"
+  end
+
+  def poll(%{poller: poller}, config) when is_function(poller, 1) do
+    poller.(config)
   end
 
   defp build_client(operation, config) do

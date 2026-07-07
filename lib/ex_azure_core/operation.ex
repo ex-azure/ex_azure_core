@@ -49,4 +49,12 @@ defprotocol ExAzureCore.Operation do
   """
   @spec stream!(t(), map()) :: Enumerable.t()
   def stream!(operation, config)
+
+  @doc """
+  Drives a long-running operation to completion.
+
+  Raises `ArgumentError` if the operation is not a long-running operation.
+  """
+  @spec poll(t(), map()) :: {:ok, term()} | {:error, term()}
+  def poll(operation, config)
 end
