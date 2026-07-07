@@ -12,16 +12,14 @@ name: Release Flow
 
 jobs:
   release-please:
-    strategy:
-      matrix:
-        elixir: ["1.20.1"]
-        otp: ["29.0"]
     runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
     steps:
       - uses: actions/create-github-app-token@v2
         id: app-token
         with:
-          app-id: 2997947
+          app-id: ${{ vars.APP_ID }}
           private-key: ${{ secrets.APP_KEY }}
 
       - name: "Prepare Release"
@@ -29,25 +27,38 @@ jobs:
         uses: googleapis/release-please-action@v4
         with:
           token: ${{ steps.app-token.outputs.token }}
-          release-type: elixir
+
+  publish:
+    needs: [release-please]
+    if: ${{ needs.release-please.outputs.release_created }}
+    strategy:
+      matrix:
+        elixir: ["1.20.1"]
+        otp: ["29.0"]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Set up Elixir
         uses: erlef/setup-beam@v1
-        if: ${{ steps.release.outputs.release_created }}
         with:
           elixir-version: ${{ matrix.elixir }}
           otp-version: ${{ matrix.otp }}
 
-      - name: Checkout
-        uses: actions/checkout@v4
-        if: ${{ steps.release.outputs.release_created }}
+      - name: Restore deps and _build cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            deps
+            _build
+          key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-mix-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-mix-
 
       - name: Fetch and Compile Dependencies
-        if: ${{ steps.release.outputs.release_created }}
         run: |
           mix deps.get
           mix deps.compile
 
       - name: Publish to hex.pm
-        if: ${{ steps.release.outputs.release_created }}
         run: HEX_API_KEY=${{ secrets.HEX_API_KEY }} mix hex.publish --yes
