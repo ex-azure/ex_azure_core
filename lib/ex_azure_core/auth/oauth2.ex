@@ -3,8 +3,6 @@ defmodule ExAzureCore.Auth.OAuth2 do
   OAuth2 token exchange for Azure AD.
   """
 
-  require Logger
-
   alias ExAzureCore.Auth.Errors.AzureAdStsError
   alias ExAzureCore.Auth.Errors.InvalidTokenFormat
   alias ExAzureCore.Errors.NetworkError

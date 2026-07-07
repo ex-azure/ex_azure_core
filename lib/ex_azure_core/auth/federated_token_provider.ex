@@ -5,8 +5,6 @@ defmodule ExAzureCore.Auth.FederatedTokenProvider do
   Provides a unified interface for obtaining tokens from various federated
   identity providers such as AWS Cognito.
   """
-  require Logger
-
   alias ExAzureCore.Auth.Errors.FederationError
 
   @doc """

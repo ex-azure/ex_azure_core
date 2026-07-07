@@ -14,8 +14,8 @@ jobs:
   release-please:
     strategy:
       matrix:
-        elixir: ["1.19.4"]
-        otp: ["28.3"]
+        elixir: ["1.20.1"]
+        otp: ["29.0"]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/create-github-app-token@v2
