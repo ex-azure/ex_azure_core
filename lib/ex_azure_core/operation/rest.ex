@@ -11,6 +11,8 @@ defmodule ExAzureCore.Operation.REST do
     * `:http_method` - HTTP method
     * `:path` - URL path (relative to base URL)
     * `:host` - Optional host override
+    * `:default_host` - Optional fallback host, used when no `:host` override
+      and no `:base_url`/`:host` is configured
     * `:body` - Request body (map for JSON, binary for raw)
     * `:params` - Query parameters
     * `:headers` - Additional headers
@@ -35,6 +37,7 @@ defmodule ExAzureCore.Operation.REST do
           http_method: http_method(),
           path: String.t(),
           host: String.t() | nil,
+          default_host: String.t() | nil,
           body: term(),
           params: map(),
           headers: [{String.t(), String.t()}],
@@ -47,6 +50,7 @@ defmodule ExAzureCore.Operation.REST do
     :http_method,
     :path,
     :host,
+    :default_host,
     body: nil,
     params: %{},
     headers: [],
@@ -110,6 +114,11 @@ defimpl ExAzureCore.Operation, for: ExAzureCore.Operation.REST do
 
   defp resolve_base_url(_operation, %{host: host}) when is_binary(host) do
     ensure_scheme(host)
+  end
+
+  defp resolve_base_url(%{default_host: default_host}, _config)
+       when is_binary(default_host) and default_host != "" do
+    ensure_scheme(default_host)
   end
 
   defp resolve_base_url(_operation, _config) do
