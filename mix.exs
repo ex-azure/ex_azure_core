@@ -6,7 +6,7 @@ defmodule ExAzureCore.MixProject do
       app: :ex_azure_core,
       description: description(),
       package: package(),
-      version: "0.2.0",
+      version: "0.3.0",
       elixir: "~> 1.19",
       elixirc_paths: elixirc_paths(Mix.env()),
       test_coverage: [tool: ExCoveralls],
