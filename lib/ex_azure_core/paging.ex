@@ -26,8 +26,48 @@ defmodule ExAzureCore.Paging do
   """
   @spec nextlink_stream(map(), Operation.t(), keyword()) :: Enumerable.t()
   def nextlink_stream(config, initial_op, opts) do
-    items_key = Keyword.fetch!(opts, :items)
     next_key = Keyword.fetch!(opts, :next_link)
+
+    paginate(config, initial_op, opts, fn body ->
+      case Map.get(body, next_key) do
+        url when is_binary(url) and url != "" -> {:cont, next_op(initial_op, url)}
+        _ -> :halt
+      end
+    end)
+  end
+
+  @doc """
+  Builds a lazy `Stream` that walks continuation-token pagination.
+
+  Fetches `initial_op`, extracts the page's items and a continuation token from
+  each response body, decodes each item, and re-issues the *same* operation with
+  the token set on a request parameter until the token is absent.
+
+  ## Options
+
+    * `:items` - response body key holding the page's item list (required)
+    * `:token_response` - response body key holding the continuation token (required)
+    * `:token_query` - query parameter name to carry the token on the next request
+    * `:token_header` - header name to carry the token (use instead of `:token_query`)
+    * `:decode` - 1-arity function applied to each raw item (default: identity)
+  """
+  @spec continuation_stream(map(), Operation.t(), keyword()) :: Enumerable.t()
+  def continuation_stream(config, initial_op, opts) do
+    token_key = Keyword.fetch!(opts, :token_response)
+    put_token = token_putter(opts)
+
+    paginate(config, initial_op, opts, fn body ->
+      case Map.get(body, token_key) do
+        token when is_nil(token) or token == "" -> :halt
+        token -> {:cont, put_token.(initial_op, token)}
+      end
+    end)
+  end
+
+  # Shared page-walk: fetch a page, emit decoded items, then let `advance` decide
+  # the next operation (or `:halt`) from the raw response body.
+  defp paginate(config, initial_op, opts, advance) do
+    items_key = Keyword.fetch!(opts, :items)
     decode = Keyword.get(opts, :decode, & &1)
 
     Stream.resource(
@@ -39,14 +79,26 @@ defmodule ExAzureCore.Paging do
         {:cont, op} ->
           body = fetch_body(op, config)
           items = body |> Map.get(items_key) |> List.wrap() |> Enum.map(decode)
-
-          case Map.get(body, next_key) do
-            url when is_binary(url) and url != "" -> {items, {:cont, next_op(initial_op, url)}}
-            _ -> {items, :halt}
-          end
+          {items, advance.(body)}
       end,
       fn _ -> :ok end
     )
+  end
+
+  defp token_putter(opts) do
+    cond do
+      name = Keyword.get(opts, :token_query) ->
+        fn op, token -> %{op | params: Map.put(op.params || %{}, name, token)} end
+
+      name = Keyword.get(opts, :token_header) ->
+        fn op, token ->
+          headers = List.keystore(op.headers || [], name, 0, {name, to_string(token)})
+          %{op | headers: headers}
+        end
+
+      true ->
+        raise ArgumentError, "continuation_stream requires :token_query or :token_header"
+    end
   end
 
   defp fetch_body(op, config) do

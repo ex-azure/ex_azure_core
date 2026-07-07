@@ -76,4 +76,44 @@ defmodule ExAzureCore.PagingTest do
 
     assert result == [%{"id" => 1}]
   end
+
+  describe "continuation_stream/3" do
+    test "re-issues the same operation with the token on a query param until absent" do
+      expect(Req, :request, fn client, opts ->
+        assert client.options[:base_url] == "https://petstore.example.com"
+        refute Map.has_key?(opts[:params] || %{}, "token")
+
+        {:ok, %Req.Response{status: 200, headers: [], body: %{"items" => [%{"id" => 1}], "nextToken" => "abc"}}}
+      end)
+
+      expect(Req, :request, fn _client, opts ->
+        assert opts[:params]["token"] == "abc"
+
+        {:ok, %Req.Response{status: 200, headers: [], body: %{"items" => [%{"id" => 2}], "nextToken" => nil}}}
+      end)
+
+      result =
+        Paging.continuation_stream(%{}, op(),
+          items: "items",
+          token_response: "nextToken",
+          token_query: "token",
+          decode: &Map.fetch!(&1, "id")
+        )
+        |> Enum.to_list()
+
+      assert result == [1, 2]
+    end
+
+    test "halts on an empty-string token" do
+      expect(Req, :request, fn _client, _opts ->
+        {:ok, %Req.Response{status: 200, headers: [], body: %{"items" => [%{"id" => 1}], "nextToken" => ""}}}
+      end)
+
+      result =
+        Paging.continuation_stream(%{}, op(), items: "items", token_response: "nextToken", token_query: "token")
+        |> Enum.to_list()
+
+      assert result == [%{"id" => 1}]
+    end
+  end
 end
